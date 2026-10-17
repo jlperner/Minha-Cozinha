@@ -11,7 +11,7 @@ PWA (site instalável) de biblioteca de receitas, em português, para tablet e c
 - Receitas ficam **no aparelho** (IndexedDB `receitas`, chave→valor): `lista` (metadados), `cats`, `arq/<id>` (arquivo original), `pag/<id>/<n>` (páginas do PDF em JPEG), `thumb/<id>`.
 - Tipos: youtube, instagram, tiktok, pdf, imagem, link, texto (`detectar()` em `app.js`). Mensagem do WhatsApp com link vira o tipo do link, com a mensagem nas anotações.
 - Título e foto automáticos: `metaAuto()` usa noembed, oEmbed do TikTok e microlink (grátis, ~50/dia). Instagram quase nunca dá foto → botão "🖼 Foto de capa".
-- Campo "Autor" (guardado como `origem` na receita): entra na busca, na tela da receita e no envio pelo WhatsApp.
+- Campo "Autor" (guardado como `origem`; preenchido sozinho com canal/site via `metaAuto().author`, título limpo por `limpaTitulo()`): entra na busca, na tela da receita e no envio pelo WhatsApp.
 - Categoria obrigatória no formulário (etiquetas `fillCatChips()`). Botão 🍲 no topo escolhe a categoria (`openCatMenu()`); dentro de uma categoria aparece a barra `#types` com o nome dela e os filtros de tipo (`renderTypes()`).
 - Classificação: `nota` 0–5 estrelas, escolhida no formulário (`fillNota()`), aparece no canto superior esquerdo do cartão e na tela da receita.
 - Busca: mostra as receitas do app e, abaixo, a sanfona "Buscar na web" (`renderWeb()`): sites grandes de receita (lista `SITES`), Google, YouTube, TikTok, Instagram. Abre aberta quando não acha nada no app; fecha ao clicar fora.

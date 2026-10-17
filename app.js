@@ -104,21 +104,31 @@ const ttId = (url) => (url.match(/\/video\/(\d+)/) || [])[1];
 const metaCache = {};
 async function metaAuto(url) {
   if (metaCache[url]) return metaCache[url];
-  const out = { title: '', image: '' };
+  const out = { title: '', image: '', author: '' };
   const enc = encodeURIComponent(url);
   const tenta = async (api, pega) => {
-    if (out.title && out.image) return;
+    if (out.title && out.image && out.author) return;
     try {
       const j = await (await fetch(api)).json();
       const r = pega(j) || {};
       out.title ||= r.title || '';
       out.image ||= r.image || '';
+      out.author ||= r.author || '';
     } catch {}
   };
-  await tenta('https://noembed.com/embed?url=' + enc, (j) => ({ title: j.title, image: j.thumbnail_url }));
-  if (/tiktok\.com/.test(url)) await tenta('https://www.tiktok.com/oembed?url=' + enc, (j) => ({ title: j.title, image: j.thumbnail_url }));
-  await tenta('https://api.microlink.io/?url=' + enc, (j) => j.status === 'success' && { title: j.data.title, image: j.data.image?.url || j.data.logo?.url });
+  await tenta('https://noembed.com/embed?url=' + enc, (j) => ({ title: j.title, image: j.thumbnail_url, author: j.author_name }));
+  if (/tiktok\.com/.test(url)) await tenta('https://www.tiktok.com/oembed?url=' + enc, (j) => ({ title: j.title, image: j.thumbnail_url, author: j.author_name }));
+  await tenta('https://api.microlink.io/?url=' + enc, (j) => j.status === 'success' && { title: j.data.title, image: j.data.image?.url || j.data.logo?.url, author: j.data.publisher || j.data.author });
+  out.title = limpaTitulo(out.title, out.author);
   return (metaCache[url] = out);
+}
+// "Receita de Arroz carreteiro, enviada por fulano - TudoGostoso" → "Arroz carreteiro"
+function limpaTitulo(t, site) {
+  t = (t || '').trim();
+  const partes = t.split(/\s+[-|–—]\s+/);
+  if (partes.length > 1 && ((site && norm(partes.at(-1)).replace(/\s/g, '').includes(norm(site).replace(/\s/g, '').slice(0, 6))) || /receitas?|gostoso|panelinha|globo|nestle|cybercook|youtube|\.com/i.test(partes.at(-1)))) t = partes.slice(0, -1).join(' - ');
+  t = t.replace(/,?\s+enviad[ao] por .*$/i, '').replace(/^receita (de|da|do)\s+/i, '').trim();
+  return t ? t[0].toUpperCase() + t.slice(1) : '';
 }
 const tituloAuto = async (url) => (await metaAuto(url)).title;
 
@@ -449,6 +459,7 @@ async function onAddChange() {
       busca.remove();
       if (detectado?.url !== url) return;
       if (m.title && !$('add-name').value) $('add-name').value = m.title;
+      if (m.author && !$('add-origem').value) $('add-origem').value = m.author;
       if (m.image && !prev.querySelector('img')) prev.append(Object.assign(document.createElement('img'), { src: m.image }));
       if (!m.image && !prev.querySelector('img')) prev.append(Object.assign(document.createElement('span'), { className: 'muted', textContent: 'Este site não mostra foto. Use 🖼 Foto de capa se quiser.' }));
     }, 400);

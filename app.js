@@ -342,7 +342,6 @@ $('more-btn').onclick = (e) => {
   const m = $('more-menu');
   if (!m.hidden) return (m.hidden = true);
   m.replaceChildren(
-    button('🏷 Gerenciar categorias', '', () => { m.hidden = true; openCatsDialog(); }),
     button('💾 Backup (salvar / restaurar)', '', () => { m.hidden = true; openBackup(); }),
   );
   m.hidden = false;

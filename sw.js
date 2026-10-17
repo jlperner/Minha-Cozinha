@@ -1,6 +1,6 @@
 // Guarda o app (e o leitor de PDF) para abrir sem internet; as receitas ficam no IndexedDB do app.
 // Também recebe o que vem pelo "Compartilhar" do Android (share target) e entrega para o app.
-const CACHE = 'receitas-v20';
+const CACHE = 'receitas-v21';
 const APP = ['./', 'index.html', 'app.js', 'styles.css', 'manifest.json', 'icon.svg'];
 const LIBS = [
   'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',

@@ -119,9 +119,22 @@ async function metaAuto(url) {
   await tenta('https://noembed.com/embed?url=' + enc, (j) => ({ title: j.title, image: j.thumbnail_url, author: j.author_name }));
   if (/tiktok\.com/.test(url)) await tenta('https://www.tiktok.com/oembed?url=' + enc, (j) => ({ title: j.title, image: j.thumbnail_url, author: j.author_name }));
   await tenta('https://api.microlink.io/?url=' + enc, (j) => j.status === 'success' && { title: j.data.title, image: j.data.image?.url || j.data.logo?.url, author: j.data.publisher || j.data.author });
+  if (/instagram\.com/.test(url)) instaTitulo(out);
   out.title = limpaTitulo(out.title, out.author);
   return (metaCache[url] = out);
 }
+// Instagram devolve o perfil no lugar do título:
+//   "Fulano on Instagram: "legenda…""  → autor Fulano, título = 1ª linha da legenda
+//   "Fulano (@fulano) • Instagram reel" / "Instagram reel by Fulano"  → só autor
+function instaTitulo(out) {
+  const t = (out.title || '').trim();
+  let m = t.match(/^(.+?)\s+(?:on|no) Instagram:\s*["“]?([\s\S]*?)["”]?$/i);
+  if (m) { out.author ||= m[1]; out.title = m[2].split(/\n/)[0].replace(/[#@]\S+/g, '').trim().slice(0, 80); return; }
+  m = t.match(/^(.+?)\s*(?:\(@[\w.]+\))?\s*[•·|]\s*Instagram/i) || t.match(/^Instagram (?:reel|post|video|photo|foto|vídeo)s? (?:by|de|do|da) (.+?)(?:\s*[•·|].*)?$/i);
+  if (m || /instagram/i.test(t)) { if (m) out.author ||= m[1].trim(); out.title = ''; }
+  if (out.author) out.author = out.author.replace(/\s*\(@[\w.]+\)/, '').trim();
+}
+
 // "Receita de Arroz carreteiro, enviada por fulano - TudoGostoso" → "Arroz carreteiro"
 function limpaTitulo(t, site) {
   t = (t || '').trim();

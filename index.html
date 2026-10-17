@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Minha Cozinha</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg">
+<link rel="apple-touch-icon" href="icon.svg">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#fffaf3">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header>
+  <div class="top">
+    <div class="brand">
+      <h1>Minha Cozinha</h1>
+      <p>O que vamos cozinhar hoje?</p>
+    </div>
+    <div class="acts">
+      <div class="wrap"><button id="cat-btn" class="ghost" title="Categorias"><span class="txt"> Categorias</span></button><div id="cat-menu" class="menu" hidden></div></div>
+      <button id="fav-btn" class="ghost" title="Só favoritas">★<span class="txt"> Favoritas</span></button>
+      <div class="wrap"><button id="more-btn" class="ghost" title="Mais opções">⋯</button><div id="more-menu" class="menu right" hidden></div></div>
+    </div>
+  </div>
+  <div class="search-box">
+    <span class="lupa">🔍</span>
+    <input id="search" type="search" placeholder="Buscar receita, ingrediente, autor…" autocomplete="off">
+    <button id="clear" title="Limpar busca" hidden>✕</button>
+  </div>
+</header>
+
+<button id="add-btn" title="Adicionar receita" aria-label="Adicionar receita"><span class="mais">+</span> Nova receita</button>
+
+<nav id="types"></nav>
+
+<main>
+  <div id="web" hidden></div>
+  <div id="status">Carregando…</div>
+  <div id="grid"></div>
+</main>
+
+<!-- Adicionar / editar -->
+<dialog id="add-dlg">
+  <h2 id="add-title">Adicionar receita</h2>
+  <label class="lbl">Link ou texto (YouTube, Instagram, TikTok, site, mensagem do WhatsApp…)</label>
+  <textarea id="add-text" rows="3" placeholder="Cole aqui"></textarea>
+  <div class="add-row">
+    <button id="add-paste">📋 Colar</button>
+    <button id="add-file-btn">📄 PDF ou foto</button>
+    <button id="add-cover-btn" title="Escolher a imagem que aparece no cartão">🖼 Foto de capa</button>
+    <span id="add-detect" class="muted"></span>
+  </div>
+  <div id="add-preview"></div>
+  <label class="lbl">Nome da receita</label>
+  <input id="add-name" placeholder="Ex.: Bolo de cenoura da vó">
+  <label class="lbl">Classificação</label>
+  <div id="add-nota" class="nota-pick"></div>
+  <label class="lbl">Autor</label>
+  <input id="add-origem" placeholder="Ex.: Vó Maria, Ana Maria Braga, livro…">
+  <label class="lbl">Categoria <b class="obrig">*</b></label>
+  <div id="add-cat" class="chips"></div>
+  <div class="add-row" id="add-newcat-row" hidden>
+    <input id="add-newcat" placeholder="Nome da nova categoria (ex.: Salgados)">
+    <button id="add-newcat-ok" class="pri">Criar</button>
+  </div>
+  <label class="lbl">Anotações (ingredientes, dicas…)</label>
+  <textarea id="add-notes" rows="4" placeholder="Opcional"></textarea>
+  <div class="dlg-foot"><button id="add-cancel">Cancelar</button><button id="add-save" class="pri">Salvar</button></div>
+  <input id="add-file" type="file" accept="application/pdf,.pdf,image/*" hidden>
+  <input id="add-cover" type="file" accept="image/*" hidden>
+</dialog>
+
+<!-- Ver receita -->
+<div id="view" hidden>
+  <div class="vbar">
+    <button id="v-close">✕<span class="ptxt"> Fechar</span></button>
+    <span id="v-title"></span>
+    <button id="v-fav">☆</button>
+    <button id="v-zap" class="zap">WhatsApp</button>
+    <button id="v-share">↗<span class="ptxt"> Enviar</span></button>
+    <button id="v-open" hidden>🌐<span class="ptxt"> Abrir</span></button>
+    <button id="v-edit">✏<span class="ptxt"> Editar</span></button>
+    <button id="v-del" class="danger">🗑</button>
+  </div>
+  <div id="v-body"></div>
+</div>
+
+<!-- Categorias -->
+<dialog id="cats-dlg">
+  <h2>Gerenciar categorias</h2>
+  <div id="cats-list"></div>
+  <div class="add-row"><input id="cat-new" placeholder="Nova categoria (ex.: Doces)"><button id="cat-new-btn" class="pri">+ Criar</button></div>
+  <div class="dlg-foot"><span></span><button id="cats-close">Fechar</button></div>
+</dialog>
+
+<!-- Backup -->
+<dialog id="bkp-dlg">
+  <h2>Backup das receitas</h2>
+  <p class="muted">As receitas ficam guardadas neste aparelho. Faça um backup para não perder e para passar para outro aparelho.</p>
+  <button id="bkp-export" class="opt"><b>⬇ Salvar backup</b><span>Gera um arquivo com todas as receitas, PDFs e fotos</span></button>
+  <button id="bkp-import-btn" class="opt"><b>⬆ Restaurar backup</b><span>Junta as receitas de um arquivo de backup com as deste aparelho</span></button>
+  <p id="bkp-storage" class="storage" hidden></p>
+  <div class="dlg-foot"><span></span><button id="bkp-close">Fechar</button></div>
+  <input id="bkp-file" type="file" accept=".json,application/json" hidden>
+</dialog>
+
+<div id="toast"></div>
+
+<div id="install-bar" hidden>
+  <span id="install-text"></span>
+  <button id="install-go" class="pri" hidden>Instalar</button>
+  <button id="install-later">Agora não</button>
+</div>
+
+<div id="prog" hidden>
+  <div class="prog-box">
+    <b>Aguarde…</b>
+    <p id="prog-text"></p>
+    <div class="prog-track"><div id="prog-bar"></div></div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

@@ -58,7 +58,11 @@ header .active { background: #fde68a; color: #78350f; }
 
 /* ---- Grade ---- */
 main { padding: 16px 20px 110px; max-width: 1240px; margin: 0 auto; }
-#status { color: var(--muted); margin-bottom: 14px; font-size: 14px; font-weight: 600; }
+#status-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 14px; min-height: 34px; }
+#status { color: var(--muted); font-size: 14px; font-weight: 600; }
+#sort-wrap[hidden] { display: none; }
+#sort-btn { height: 34px; padding: 0 12px; border-radius: 17px; background: #fff; border: 1px solid var(--line); font-size: 14px; font-weight: 600; color: var(--txt); }
+#sort-menu { top: 40px; min-width: 200px; }
 #web { max-width: 560px; margin: 0 0 16px; }
 #web.fim { margin-top: 24px; }
 #web details { background: #fff; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,.1); overflow: hidden; }

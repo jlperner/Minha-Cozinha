@@ -194,7 +194,7 @@ function renderWeb(achou) {
   if (!t) return;
   // com resultados no app, a busca na web fica no fim da lista
   web.classList.toggle('fim', achou > 0);
-  (achou > 0 ? $('grid') : $('status')).after(web);
+  (achou > 0 ? $('grid') : $('status-row')).after(web);
   const e = encodeURIComponent;
   const g = (extra) => `https://www.google.com/search?q=${e(`receita ${t} ${extra}`.trim())}`;
   const a = (n, u, c = '') => `<a href="${esc(u)}" target="_blank" rel="noopener"${c && ` class="${c}"`}>${n}</a>`;
@@ -216,15 +216,41 @@ document.addEventListener('click', (e) => {
   if (d && !d.contains(e.target) && !e.target.closest('.search-box')) d.open = false;
 });
 
+// ordenar a lista (a escolha fica guardada neste aparelho)
+const porTexto = (campo) => (a, b) => (!a[campo]) - (!b[campo]) || (a[campo] || '').localeCompare(b[campo] || '', 'pt-BR', { sensitivity: 'base' });
+const ORDENS = {
+  recentes: { nome: 'Mais recentes', fn: (a, b) => b.criado - a.criado },
+  antigas: { nome: 'Mais antigas', fn: (a, b) => a.criado - b.criado },
+  nome: { nome: 'Nome (A–Z)', fn: porTexto('titulo') },
+  nota: { nome: 'Melhor nota', fn: (a, b) => (b.nota || 0) - (a.nota || 0) || b.criado - a.criado },
+  autor: { nome: 'Autor (A–Z)', fn: (a, b) => porTexto('origem')(a, b) || porTexto('titulo')(a, b) },
+};
+let ordem = 'recentes';
+try { if (ORDENS[localStorage.getItem('ordem')]) ordem = localStorage.getItem('ordem'); } catch {}
+$('sort-btn').onclick = (e) => {
+  e.stopPropagation();
+  const m = $('sort-menu');
+  if (!m.hidden) return (m.hidden = true);
+  m.replaceChildren(...Object.entries(ORDENS).map(([k, o]) => button(o.nome, k === ordem ? 'on' : '', () => {
+    ordem = k;
+    try { localStorage.setItem('ordem', k); } catch {}
+    m.hidden = true;
+    render();
+  })));
+  m.hidden = false;
+};
+
 function render() {
   const q = norm($('search').value.trim());
-  let list = [...receitas].sort((a, b) => b.criado - a.criado);
+  let list = [...receitas].sort(ORDENS[ordem].fn);
   if (filtroTipo) list = list.filter((r) => r.tipo === filtroTipo);
   if (filtroCat) list = list.filter((r) => (filtroCat === '__sem' ? !r.cat : r.cat === filtroCat));
   if (soFav) list = list.filter((r) => r.fav);
   if (q) list = list.filter((r) => q.split(/\s+/).every((w) => norm(`${r.titulo} ${r.origem || ''} ${r.notas} ${r.cat} ${r.url} ${r.texto || ''}`).includes(w)));
   const t = $('search').value.trim();
-  $('status').textContent = !receitas.length ? '' : t && !list.length ? `Nada com "${t}" no app.` : `${list.length} receita(s)`;
+  $('status').textContent = !receitas.length ? '' : t && !list.length ? `Nada com "${t}" no app.` : `${list.length} ${list.length === 1 ? 'receita' : 'receitas'}`;
+  $('sort-wrap').hidden = list.length < 2;
+  $('sort-btn').textContent = `⇅ ${ORDENS[ordem].nome} ▾`;
   renderWeb(list.length);
   const grid = $('grid');
   grid.innerHTML = '';
@@ -370,7 +396,7 @@ $('more-btn').onclick = (e) => {
   m.hidden = false;
 };
 document.addEventListener('click', (e) => {
-  for (const id of ['cat-menu', 'more-menu']) if (!$(id).contains(e.target)) $(id).hidden = true;
+  for (const id of ['cat-menu', 'more-menu', 'sort-menu']) if (!$(id).contains(e.target)) $(id).hidden = true;
 });
 
 // ---------- Adicionar / editar ----------

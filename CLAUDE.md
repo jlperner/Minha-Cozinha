@@ -16,6 +16,7 @@ PWA (site instalável) de biblioteca de receitas, em português, para tablet e c
 - Classificação: `nota` 0–5 estrelas, escolhida no formulário (`fillNota()`), aparece no canto superior esquerdo do cartão e na tela da receita.
 - Ordenar (`ORDENS` em `app.js`, botão ⇅ ao lado da contagem): recentes, antigas, nome, nota, autor; a escolha fica no `localStorage`.
 - Busca: mostra as receitas do app e, abaixo, a sanfona "Buscar na web" (`renderWeb()`): sites grandes de receita (lista `SITES`), Google, YouTube, TikTok, Instagram. Abre aberta quando não acha nada no app; fecha ao clicar fora.
+- Seleção em lote: ⋯ → Selecionar receitas, ou segurar o dedo num cartão (`entrarSelecao()`); barra `#sel-bar` com Marcar todas (respeita filtro/busca), Mover para categoria e Apagar (pede confirmação).
 - Backup: ⋯ → Backup gera um JSON com tudo (arquivos em base64) e restaura juntando.
 
 ## Teste local

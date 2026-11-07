@@ -211,3 +211,24 @@ body:has(#install-bar:not([hidden])) #add-btn { bottom: calc(max(12px, env(safe-
 .ico-panela { width: 20px; height: 20px; vertical-align: -4px; flex: none; }
 #cat-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
 #types .cat-atual .ico-panela { width: 17px; height: 17px; vertical-align: -3px; margin-right: 2px; }
+
+/* ---- Seleção em lote ---- */
+#sel-bar { position: fixed; left: 12px; right: 12px; bottom: max(12px, env(safe-area-inset-bottom)); z-index: 30; display: flex; flex-wrap: wrap; align-items: center; gap: 8px;
+  max-width: 760px; margin: 0 auto; padding: 10px 12px; border-radius: 16px; background: #fff; box-shadow: 0 8px 30px rgba(0,0,0,.22); }
+#sel-bar[hidden] { display: none; }
+#sel-count { flex: 1 1 100%; font-weight: 800; color: var(--pri); padding: 0 4px; }
+#sel-bar > button, #sel-bar .wrap { flex: 1 1 auto; }
+#sel-bar .wrap button { width: 100%; }
+#sel-cat-menu { top: auto; bottom: 46px; }
+body.selecionando #add-btn, body.selecionando #install-bar { display: none; }
+body.selecionando main { padding-bottom: 170px; }
+body.selecionando .card .star { display: none; }
+.card .check { position: absolute; top: 8px; right: 8px; z-index: 2; width: 30px; height: 30px; border-radius: 50%; border: 2.5px solid #fff;
+  background: rgba(0,0,0,.25); box-shadow: 0 1px 4px rgba(0,0,0,.3); }
+.card.sel { outline: 4px solid var(--acc); outline-offset: -4px; }
+.card.sel .check { background: var(--acc); border-color: #fff; }
+.card.sel .check::after { content: '✓'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 900; font-size: 17px; }
+.card { -webkit-user-select: none; user-select: none; -webkit-touch-callout: none; }
+@media (min-width: 600px) { #sel-count { flex: 1 1 auto; } #sel-bar > button, #sel-bar .wrap { flex: 0 0 auto; } }
+body.selecionando .card { animation: none; }
+#sel-move { display: inline-flex; align-items: center; justify-content: center; gap: 6px; }

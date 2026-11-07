@@ -276,10 +276,92 @@ function render() {
       if (soFav) render();
     });
     card.append(star);
-    card.onclick = () => openView(r);
+    if (selecionando) {
+      card.classList.toggle('sel', sel.has(r.id));
+      card.insertAdjacentHTML('beforeend', '<span class="check" aria-hidden="true"></span>');
+    }
+    card.onclick = () => (selecionando ? marcar(r.id) : openView(r));
+    segurarParaSelecionar(card, r.id);
     grid.append(card);
   }
+  visiveis = list;
+  if (selecionando) atualizaSelBar();
 }
+
+// ---------- Seleção em lote (apagar / mover várias) ----------
+let selecionando = false;
+const sel = new Set();
+let visiveis = [];
+function entrarSelecao(id) {
+  selecionando = true;
+  sel.clear();
+  if (id) sel.add(id);
+  document.body.classList.add('selecionando');
+  $('sel-move').innerHTML = `${PANELA} Mover`;
+  $('sel-bar').hidden = false;
+  render();
+}
+function sairSelecao() {
+  selecionando = false;
+  sel.clear();
+  document.body.classList.remove('selecionando');
+  $('sel-bar').hidden = true;
+  $('sel-cat-menu').hidden = true;
+  render();
+}
+function marcar(id) {
+  sel.has(id) ? sel.delete(id) : sel.add(id);
+  render();
+}
+function atualizaSelBar() {
+  const n = sel.size;
+  $('sel-count').textContent = n ? `${n} ${n === 1 ? 'selecionada' : 'selecionadas'}` : 'Toque nas receitas';
+  const todas = visiveis.length && visiveis.every((r) => sel.has(r.id));
+  $('sel-all').textContent = todas ? 'Desmarcar todas' : 'Marcar todas';
+  $('sel-move').disabled = $('sel-del').disabled = !n;
+}
+// segurar o dedo ~0,5 s sobre um cartão entra no modo de seleção
+function segurarParaSelecionar(card, id) {
+  let timer, segurou = false;
+  card.addEventListener('pointerdown', () => { segurou = false; timer = setTimeout(() => { segurou = true; if (!selecionando) entrarSelecao(id); else marcar(id); }, 550); });
+  for (const ev of ['pointerup', 'pointerleave', 'pointercancel', 'pointermove']) card.addEventListener(ev, (e) => { if (ev !== 'pointermove' || Math.abs(e.movementX) + Math.abs(e.movementY) > 4) clearTimeout(timer); });
+  card.addEventListener('click', (e) => { if (segurou) { e.stopImmediatePropagation(); segurou = false; } }, true);
+  card.addEventListener('contextmenu', (e) => e.preventDefault());
+}
+$('sel-cancel').onclick = sairSelecao;
+$('sel-all').onclick = () => {
+  const todas = visiveis.every((r) => sel.has(r.id));
+  for (const r of visiveis) todas ? sel.delete(r.id) : sel.add(r.id);
+  render();
+};
+$('sel-del').onclick = async () => {
+  const n = sel.size;
+  if (!n || !confirm(`Apagar ${n} ${n === 1 ? 'receita' : 'receitas'}?
+
+Isso não pode ser desfeito. Se quiser guardar, faça antes um backup (⋯ → Backup).`)) return;
+  const ids = [...sel];
+  receitas = receitas.filter((x) => !sel.has(x.id));
+  await saveList();
+  for (const id of ids) await Promise.all([dbDelPrefix('arq/' + id), dbDelPrefix('thumb/' + id), dbDelPrefix(`pag/${id}/`)]);
+  sairSelecao();
+  renderTypes();
+  toast(`${n} ${n === 1 ? 'receita apagada' : 'receitas apagadas'}.`);
+};
+$('sel-move').onclick = (e) => {
+  e.stopPropagation();
+  const m = $('sel-cat-menu');
+  if (!m.hidden) return (m.hidden = true);
+  m.replaceChildren(...cats.map((c) => button(c, '', async () => {
+    const n = sel.size;
+    for (const r of receitas) if (sel.has(r.id)) r.cat = c;
+    await saveList();
+    sairSelecao();
+    fillCatBtn();
+    toast(`${n} ${n === 1 ? 'receita movida' : 'receitas movidas'} para "${c}".`);
+  })));
+  if (!cats.length) m.append(Object.assign(document.createElement('p'), { className: 'muted', textContent: 'Nenhuma categoria ainda. Crie em 🍲 → Gerenciar categorias.' }));
+  m.hidden = false;
+};
 function snippet(r, q) {
   const w = q.split(/\s+/)[0];
   const txt = r.notas || r.texto || '';
@@ -391,12 +473,13 @@ $('more-btn').onclick = (e) => {
   const m = $('more-menu');
   if (!m.hidden) return (m.hidden = true);
   m.replaceChildren(
+    button('☑ Selecionar receitas', '', () => { m.hidden = true; entrarSelecao(); }),
     button('💾 Backup (salvar / restaurar)', '', () => { m.hidden = true; openBackup(); }),
   );
   m.hidden = false;
 };
 document.addEventListener('click', (e) => {
-  for (const id of ['cat-menu', 'more-menu', 'sort-menu']) if (!$(id).contains(e.target)) $(id).hidden = true;
+  for (const id of ['cat-menu', 'more-menu', 'sort-menu', 'sel-cat-menu']) if (!$(id).contains(e.target)) $(id).hidden = true;
 });
 
 // ---------- Adicionar / editar ----------

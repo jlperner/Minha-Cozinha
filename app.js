@@ -766,10 +766,10 @@ async function openView(r) {
   } else if (r.tipo === 'instagram' && igPath(r.url)[2]) {
     const [, k, code] = igPath(r.url);
     media = `<div class="v-media"><iframe class="tall" src="https://www.instagram.com/${k === 'reels' ? 'reel' : k}/${code}/embed/captioned/"></iframe></div>
-      <a class="v-assistir" href="${esc(r.url)}" target="_blank" rel="noopener">▶ Assistir no Instagram <small>(para adiantar e voltar o vídeo)</small></a>`;
+      <a class="v-assistir" href="${esc(r.url)}" target="_blank" rel="noopener">⏩ Adiantar ou voltar? Abrir no Instagram</a>`;
   } else if (r.tipo === 'tiktok' && ttId(r.url)) {
     media = `<div class="v-media"><iframe class="tall" src="https://www.tiktok.com/embed/v2/${ttId(r.url)}"></iframe></div>
-      <a class="v-assistir" href="${esc(r.url)}" target="_blank" rel="noopener">▶ Assistir no TikTok <small>(para adiantar e voltar o vídeo)</small></a>`;
+      <a class="v-assistir" href="${esc(r.url)}" target="_blank" rel="noopener">⏩ Adiantar ou voltar? Abrir no TikTok</a>`;
   }
   const card = document.createElement('div');
   card.className = 'v-card';

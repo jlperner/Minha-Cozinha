@@ -143,6 +143,8 @@ dialog textarea { resize: vertical; }
 #v-body { flex: 1; overflow: auto; -webkit-overflow-scrolling: touch; }
 .v-media { display: flex; justify-content: center; background: #000; }
 .v-media iframe { width: min(100%, 900px); aspect-ratio: 16 / 9; border: 0; background: #000; }
+.v-assistir { display: block; text-align: center; padding: 14px 16px; background: linear-gradient(135deg, var(--acc), var(--pri)); color: #fff; font-weight: 800; text-decoration: none; }
+.v-assistir small { display: block; font-weight: 600; opacity: .85; }
 .v-media iframe.tall { aspect-ratio: auto; height: min(82vh, 860px); width: min(100%, 540px); background: #fff; }
 .v-pages { display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 12px 0; }
 .v-pages img { width: min(100%, 1000px); height: auto; background: #fff; }

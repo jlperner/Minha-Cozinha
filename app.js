@@ -765,9 +765,11 @@ async function openView(r) {
     media = `<div class="v-media"><iframe src="https://www.youtube-nocookie.com/embed/${ytId(r.url)}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe></div>`;
   } else if (r.tipo === 'instagram' && igPath(r.url)[2]) {
     const [, k, code] = igPath(r.url);
-    media = `<div class="v-media"><iframe class="tall" src="https://www.instagram.com/${k === 'reels' ? 'reel' : k}/${code}/embed/captioned/"></iframe></div>`;
+    media = `<div class="v-media"><iframe class="tall" src="https://www.instagram.com/${k === 'reels' ? 'reel' : k}/${code}/embed/captioned/"></iframe></div>
+      <a class="v-assistir" href="${esc(r.url)}" target="_blank" rel="noopener">▶ Assistir no Instagram <small>(para adiantar e voltar o vídeo)</small></a>`;
   } else if (r.tipo === 'tiktok' && ttId(r.url)) {
-    media = `<div class="v-media"><iframe class="tall" src="https://www.tiktok.com/embed/v2/${ttId(r.url)}"></iframe></div>`;
+    media = `<div class="v-media"><iframe class="tall" src="https://www.tiktok.com/embed/v2/${ttId(r.url)}"></iframe></div>
+      <a class="v-assistir" href="${esc(r.url)}" target="_blank" rel="noopener">▶ Assistir no TikTok <small>(para adiantar e voltar o vídeo)</small></a>`;
   }
   const card = document.createElement('div');
   card.className = 'v-card';
